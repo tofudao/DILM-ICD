@@ -4,9 +4,9 @@ import torch,time,os,random
 import numpy as np
 from collections import OrderedDict
 
-class SelfAttention_PostLN(nn.Module):
+class Attention(nn.Module):
     def __init__(self, feaSize, dk, multiNum, dropout=0.1, name='selfAttn'):
-        super(SelfAttention_PostLN, self).__init__()
+        super(Attention, self).__init__()
         self.dk = dk
         self.multiNum = multiNum
         self.WQ = nn.Linear(feaSize, self.dk*multiNum)
@@ -86,7 +86,7 @@ class FFN_PostLN(nn.Module):
 class Transformer_PostLN(nn.Module):
     def __init__(self, feaSize, dk, multiNum, dropout=0.1):
         super(Transformer_PostLN, self).__init__()
-        self.selfAttn = SelfAttention_PostLN(feaSize, dk, multiNum)
+        self.selfAttn = Attention(feaSize, dk, multiNum)
         # self.ffn = FFN_PreLN(feaSize, dropout)
         self.ffn = FFN_PostLN(feaSize, dropout)
 
@@ -97,9 +97,9 @@ class Transformer_PostLN(nn.Module):
         return (self.ffn(qx, z), kx,vx, maskPAD) # => batchSize × qL × feaSize
         # return (self.ffn(qx, z), kx, vx, maskPAD)
 
-class TransformerLayers_PostLN(nn.Module):
+class Text_Label_Att(nn.Module):
     def __init__(self, seqMaxLen, layersNum, feaSize, dk, multiNum, maxItems=10, dropout=0.1, name='textTransformer'):
-        super(TransformerLayers_PostLN, self).__init__()
+        super(Text_Label_Att, self).__init__()
         self.transformerLayers = nn.Sequential(
                                      OrderedDict(
                                          [('transformer%d'%i, Transformer_PostLN(feaSize, dk, multiNum, dropout)) for i in range(layersNum)]
